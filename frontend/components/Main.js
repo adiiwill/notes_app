@@ -186,6 +186,7 @@ export default function Main({ navigation, user, signOut }) {
     <>
       <Modal
         animationType="fade"
+        
         transparent={true}
         visible={isEditOpen}
         onRequestClose={() => {

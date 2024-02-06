@@ -8,6 +8,7 @@ import {
   Pressable,
   Text,
   Image,
+  KeyboardAvoidingView
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { API_URL_UPD, API_URL_ADD } from "../Constants";
@@ -37,7 +38,6 @@ export default function EditNote({ navigation, route }) {
 
   const handleSavePress = async () => {
     let response = null;
-    let alertMsg = "No message";
 
     if (!isNewNote) {
       response = await fetch(`${API_URL_UPD}/${noteID}`, {
@@ -64,7 +64,7 @@ export default function EditNote({ navigation, route }) {
       });
     }
 
-    const responseBody = await response.json(); // Read the response body once
+    const responseBody = await response.json();
 
     if (!response.ok) {
       alert(responseBody.message);
@@ -115,15 +115,15 @@ export default function EditNote({ navigation, route }) {
           value={editContent}
         />
       )}
-      <View
-        style={{
+      <KeyboardAvoidingView behavior="position"
+        contentContainerStyle={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           marginTop: "auto",
           padding: 10,
           backgroundColor: "hsla(0, 0%, 0%, .7)",
-          borderRadius: 25
+          borderRadius: 25,
         }}
       >
         <Pressable onPress={handleExit}>
@@ -151,7 +151,7 @@ export default function EditNote({ navigation, route }) {
             style={{ width: 50, height: 50 }}
           />
         </Pressable>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
