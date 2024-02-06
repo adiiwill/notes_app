@@ -78,7 +78,10 @@ router.delete("/delete/:NoteID", async (req, res) => {
 
   try {
     // Check if the note with the given NoteID exists
-    const existingNote = await useDatabase("SELECT * FROM note WHERE NoteID = ?", [NoteID]);
+    const existingNote = await useDatabase(
+      "SELECT * FROM note WHERE NoteID = ?",
+      [NoteID]
+    );
 
     if (!existingNote || existingNote.length === 0) {
       return res.status(404).json({
@@ -97,6 +100,25 @@ router.delete("/delete/:NoteID", async (req, res) => {
       errorCode: "INTERNAL_SERVER_ERROR",
       message: "Internal Server Error",
     });
+  }
+});
+
+router.post("/setfav", async (req, res) => {
+  const { NoteID, FavState } = req.body;
+
+  if (NoteID !== undefined && FavState !== undefined) {
+    try {
+      await useDatabase("UPDATE note SET IsFav = ? WHERE NoteID = ?", [
+        FavState,
+        NoteID,
+      ]);
+      res.status(200).send("Record updated successfully");
+    } catch (error) {
+      console.error("Error updating record:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    res.status(400).send("Missing parameters");
   }
 });
 

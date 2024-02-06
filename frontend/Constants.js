@@ -7,3 +7,4 @@ export const API_URL_NOTES = `${API_URL}/note/get`;
 export const API_URL_UPD = `${API_URL}/note/update`;
 export const API_URL_ADD = `${API_URL}/note/add`;
 export const API_URL_DEL = `${API_URL}/note/delete`;
+export const API_URL_FAV = `${API_URL}/note/setfav`;

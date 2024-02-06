@@ -11,7 +11,7 @@ import {
   Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { API_URL_DEL, API_URL_NOTES } from "../Constants";
+import { API_URL_DEL, API_URL_NOTES, API_URL_FAV } from "../Constants";
 import { RefreshControl } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { useFocusEffect } from "@react-navigation/native";
@@ -33,7 +33,7 @@ export default function Main({ navigation, user, signOut }) {
 
   const getNoteByID = (id) => {
     const foundNote = notes.find((item) => id == item.NoteID);
-
+    console.log(foundNote);
     if (!foundNote) return null;
     else return foundNote;
   };
@@ -67,6 +67,7 @@ export default function Main({ navigation, user, signOut }) {
       setTitle(selectedNote.Title);
       setContent(selectedNote.Content);
       setId(selectedNote.NoteID);
+      setIsFavorited(selectedNote.IsFav);
     } else alert("An error occured while opening the note.");
   };
 
@@ -135,6 +136,27 @@ export default function Main({ navigation, user, signOut }) {
     });
   };
 
+  const handleFavoritePress = async (id, favState) => {
+    try {
+      await fetch(API_URL_FAV, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          NoteID: id,
+          FavState: favState,
+        }),
+      });
+
+      setIsFavorited(favState);
+
+      await fetchNotes();
+    } catch (error) {
+      console.error("Error updating favorite:", error);
+    }
+  };
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
 
@@ -154,6 +176,7 @@ export default function Main({ navigation, user, signOut }) {
   const [content, setContent] = useState("Content...");
   const [id, setId] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [isFavorited, setIsFavorited] = useState(null);
 
   const [filteredNotes, setFilteredNotes] = useState([]);
 
@@ -171,9 +194,20 @@ export default function Main({ navigation, user, signOut }) {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={{ fontSize: 46 }}>{title}</Text>
+            <Text
+              style={{ fontSize: 46 }}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              maxFontSizeMultiplier={1.5}
+            >
+              {title}
+            </Text>
             <ScrollView>
-              <Markdown style={{ body: { fontSize: 20 } }}>{content}</Markdown>
+              <Text>
+                <Markdown style={{ body: { fontSize: 20 } }}>
+                  {content}
+                </Markdown>
+              </Text>
             </ScrollView>
             <View style={{ display: "flex", flexDirection: "row", gap: 20 }}>
               <Pressable
@@ -188,8 +222,19 @@ export default function Main({ navigation, user, signOut }) {
               </Pressable>
               <Pressable
                 style={{ marginTop: 20, marginLeft: "auto" }}
-                onPress={handleEditPress}
+                onPress={() => handleFavoritePress(id, !getNoteByID(id).IsFav)}
               >
+                <Image
+                  source={
+                    isFavorited
+                      ? require("../images/star-solid-144.png")
+                      : require("../images/star-regular-144.png")
+                  }
+                  style={{ width: 40, height: 40 }}
+                  tintColor={"hsla(44, 100%, 50%, .7)"}
+                />
+              </Pressable>
+              <Pressable style={{ marginTop: 20 }} onPress={handleEditPress}>
                 <Image
                   source={require("../images/edit-solid-144.png")}
                   style={{ width: 40, height: 40 }}
@@ -262,31 +307,132 @@ export default function Main({ navigation, user, signOut }) {
             />
           }
         >
-          {filteredNotes !== null && filteredNotes.length > 0
-            ? filteredNotes.map((item) => (
-                <Pressable
-                  style={styles.note}
-                  key={item.NoteID}
-                  onPress={() => handleNotePress(item.NoteID)}
-                >
-                  <Text style={styles.noteTitle}>{item.Title}</Text>
-                  <Text style={styles.noteDate}>
-                    {new Date(item.CreationDate).toLocaleDateString()}
-                  </Text>
-                </Pressable>
-              ))
-            : notes.map((item) => (
-                <Pressable
-                  style={styles.note}
-                  key={item.NoteID}
-                  onPress={() => handleNotePress(item.NoteID)}
-                >
-                  <Text style={styles.noteTitle}>{item.Title}</Text>
-                  <Text style={styles.noteDate}>
-                    {new Date(item.CreationDate).toLocaleDateString()}
-                  </Text>
-                </Pressable>
-              ))}
+          <View
+            style={{
+              backgroundColor: "hsla(44, 100%, 50%, .2)",
+              borderRadius: 10,
+            }}
+          >
+            <View
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-evenly",
+              }}
+            >
+              <Image
+                source={require("../images/star-solid-144.png")}
+                style={{ height: 30, width: 30 }}
+                tintColor={"hsla(44, 100%, 50%, .7)"}
+              />
+              <Text style={styles.sectionHeaderText}>Favorite Notes</Text>
+              <Image
+                source={require("../images/star-solid-144.png")}
+                style={{ height: 30, width: 30 }}
+                tintColor={"hsla(44, 100%, 50%, .7)"}
+              />
+            </View>
+            {filteredNotes !== null && filteredNotes.length > 0
+              ? filteredNotes.map((item) => {
+                  if (item.IsFav) {
+                    return (
+                      <Pressable
+                        style={{
+                          ...styles.note,
+                          borderColor: "hsla(44, 100%, 50%, .7)",
+                          borderWidth: 3,
+                        }}
+                        key={item.NoteID}
+                        onPress={() => handleNotePress(item.NoteID)}
+                      >
+                        <Text
+                          style={styles.noteTitle}
+                          ellipsizeMode="tail"
+                          numberOfLines={1}
+                        >
+                          {item.Title}
+                        </Text>
+                        <Text style={styles.noteDate}>
+                          {new Date(item.CreationDate).toLocaleDateString()}
+                        </Text>
+                      </Pressable>
+                    );
+                  } else {
+                    return null;
+                  }
+                })
+              : notes
+                  .filter((item) => item.IsFav)
+                  .map((item) => (
+                    <Pressable
+                      style={{
+                        ...styles.note,
+                        borderColor: "hsla(44, 100%, 50%, .7)",
+                        borderWidth: 3,
+                      }}
+                      key={item.NoteID}
+                      onPress={() => handleNotePress(item.NoteID)}
+                    >
+                      <Text
+                        style={styles.noteTitle}
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
+                      >
+                        {item.Title}
+                      </Text>
+                      <Text style={styles.noteDate}>
+                        {new Date(item.CreationDate).toLocaleDateString()}
+                      </Text>
+                    </Pressable>
+                  ))}
+          </View>
+
+          <View>
+            <Text style={styles.sectionHeaderText}>Other Notes</Text>
+            {filteredNotes !== null && filteredNotes.length > 0
+              ? filteredNotes.map(
+                  (item) =>
+                    !item.IsFav && (
+                      <Pressable
+                        style={styles.note}
+                        key={item.NoteID}
+                        onPress={() => handleNotePress(item.NoteID)}
+                      >
+                        <Text
+                          style={styles.noteTitle}
+                          ellipsizeMode="tail"
+                          numberOfLines={1}
+                        >
+                          {item.Title}
+                        </Text>
+                        <Text style={styles.noteDate}>
+                          {new Date(item.CreationDate).toLocaleDateString()}
+                        </Text>
+                      </Pressable>
+                    )
+                )
+              : notes
+                  .filter((item) => !item.IsFav)
+                  .map((item) => (
+                    <Pressable
+                      style={styles.note}
+                      key={item.NoteID}
+                      onPress={() => handleNotePress(item.NoteID)}
+                    >
+                      <Text
+                        style={styles.noteTitle}
+                        ellipsizeMode="tail"
+                        numberOfLines={1}
+                      >
+                        {item.Title}
+                      </Text>
+                      <Text style={styles.noteDate}>
+                        {new Date(item.CreationDate).toLocaleDateString()}
+                      </Text>
+                    </Pressable>
+                  ))}
+          </View>
         </ScrollView>
 
         <Pressable style={styles.addNoteButton} onPress={handleAddNote}>
@@ -342,6 +488,7 @@ const styles = StyleSheet.create({
   sectionHeaderText: {
     color: "#fff",
     fontSize: 32,
+    textAlign: "center",
   },
   scrollView: {
     width: "100%",
