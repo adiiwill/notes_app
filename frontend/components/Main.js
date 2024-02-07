@@ -18,7 +18,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 export default function Main({ navigation, user, signOut }) {
   const [pfp, setPfp] = useState(
-    "https://i.ibb.co/60MSfDC/placeholder-pfp.png"
+    "https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
   );
 
   const [notes, setNotes] = useState([]);
