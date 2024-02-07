@@ -4,11 +4,10 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
-  Keyboard,
   Pressable,
-  Text,
   Image,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { API_URL_UPD, API_URL_ADD } from "../Constants";
@@ -113,10 +112,12 @@ export default function EditNote({ navigation, route }) {
           multiline
           onChangeText={(text) => handleContentChange(text)}
           value={editContent}
+          textAlignVertical="top"
         />
       )}
-      <KeyboardAvoidingView behavior="position"
-        contentContainerStyle={{
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
@@ -141,7 +142,11 @@ export default function EditNote({ navigation, route }) {
                 : require("../images/eye_toggle_off.png")
             }
             tintColor={"#0091f7"}
-            style={{ width: 50, height: 50 }}
+            style={{
+              width: 50,
+              height: 50,
+              marginBottom: Platform.OS === "ios" ? 10 : 0,
+            }}
           />
         </Pressable>
         <Pressable onPress={handleSavePress}>

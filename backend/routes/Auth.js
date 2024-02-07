@@ -1,6 +1,6 @@
 const { useDatabase } = require("../tools/useDatabase");
 const router = require("express").Router();
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 router.post("/login", async (req, res) => {
   // {

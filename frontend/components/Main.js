@@ -13,7 +13,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { API_URL_DEL, API_URL_NOTES, API_URL_FAV } from "../Constants";
 import { RefreshControl } from "react-native";
-import Markdown from "react-native-markdown-display";
+import Markdown, { AstRenderer } from "react-native-markdown-display";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default function Main({ navigation, user, signOut }) {
@@ -186,7 +186,6 @@ export default function Main({ navigation, user, signOut }) {
     <>
       <Modal
         animationType="fade"
-        
         transparent={true}
         visible={isEditOpen}
         onRequestClose={() => {
@@ -204,11 +203,7 @@ export default function Main({ navigation, user, signOut }) {
               {title}
             </Text>
             <ScrollView>
-              <Text>
-                <Markdown style={{ body: { fontSize: 20 } }}>
-                  {content}
-                </Markdown>
-              </Text>
+              <Markdown style={{ body: { fontSize: 20 } }}>{content}</Markdown>
             </ScrollView>
             <View style={{ display: "flex", flexDirection: "row", gap: 20 }}>
               <Pressable
@@ -524,9 +519,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: 350,
     height: 700,
     gap: 10,
+    margin: 20,
   },
   addNoteButton: {
     position: "relative",

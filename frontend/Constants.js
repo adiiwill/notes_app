@@ -1,4 +1,4 @@
-export const API_URL = "http://172.20.10.13:8000";
+export const API_URL = "http://nodejs1.dszcbaross.edu.hu:22001";
 
 export const API_URL_AUTH = `${API_URL}/auth/login`;
 export const API_URL_REG = `${API_URL}/user/add`;
