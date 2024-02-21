@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,8 +13,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { API_URL_DEL, API_URL_NOTES, API_URL_FAV } from "../Constants";
 import { RefreshControl } from "react-native";
-import Markdown, { AstRenderer } from "react-native-markdown-display";
+import Markdown from "react-native-markdown-display";
 import { useFocusEffect } from "@react-navigation/native";
+import Note from "./Note";
 
 export default function Main({ navigation, user, signOut }) {
   const [pfp, setPfp] = useState(
@@ -44,7 +45,7 @@ export default function Main({ navigation, user, signOut }) {
   }, []);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       fetchNotes();
     }, [])
   );
@@ -180,7 +181,7 @@ export default function Main({ navigation, user, signOut }) {
 
   const [filteredNotes, setFilteredNotes] = useState([]);
 
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   return (
     <>
@@ -333,26 +334,11 @@ export default function Main({ navigation, user, signOut }) {
               ? filteredNotes.map((item) => {
                   if (item.IsFav) {
                     return (
-                      <Pressable
-                        style={{
-                          ...styles.note,
-                          borderColor: "hsla(44, 100%, 50%, .7)",
-                          borderWidth: 3,
-                        }}
-                        key={item.NoteID}
-                        onPress={() => handleNotePress(item.NoteID)}
-                      >
-                        <Text
-                          style={styles.noteTitle}
-                          ellipsizeMode="tail"
-                          numberOfLines={1}
-                        >
-                          {item.Title}
-                        </Text>
-                        <Text style={styles.noteDate}>
-                          {new Date(item.CreationDate).toLocaleDateString()}
-                        </Text>
-                      </Pressable>
+                      <Note
+                        item={item}
+                        isFav={true}
+                        handleNotePress={() => handleNotePress(item.NoteID)}
+                      />
                     );
                   } else {
                     return null;
@@ -361,26 +347,11 @@ export default function Main({ navigation, user, signOut }) {
               : notes
                   .filter((item) => item.IsFav)
                   .map((item) => (
-                    <Pressable
-                      style={{
-                        ...styles.note,
-                        borderColor: "hsla(44, 100%, 50%, .7)",
-                        borderWidth: 3,
-                      }}
-                      key={item.NoteID}
-                      onPress={() => handleNotePress(item.NoteID)}
-                    >
-                      <Text
-                        style={styles.noteTitle}
-                        ellipsizeMode="tail"
-                        numberOfLines={1}
-                      >
-                        {item.Title}
-                      </Text>
-                      <Text style={styles.noteDate}>
-                        {new Date(item.CreationDate).toLocaleDateString()}
-                      </Text>
-                    </Pressable>
+                    <Note
+                      item={item}
+                      isFav={true}
+                      handleNotePress={() => handleNotePress(item.NoteID)}
+                    />
                   ))}
           </View>
 
@@ -390,43 +361,21 @@ export default function Main({ navigation, user, signOut }) {
               ? filteredNotes.map(
                   (item) =>
                     !item.IsFav && (
-                      <Pressable
-                        style={styles.note}
-                        key={item.NoteID}
-                        onPress={() => handleNotePress(item.NoteID)}
-                      >
-                        <Text
-                          style={styles.noteTitle}
-                          ellipsizeMode="tail"
-                          numberOfLines={1}
-                        >
-                          {item.Title}
-                        </Text>
-                        <Text style={styles.noteDate}>
-                          {new Date(item.CreationDate).toLocaleDateString()}
-                        </Text>
-                      </Pressable>
+                      <Note
+                        item={item}
+                        isFav={false}
+                        handleNotePress={() => handleNotePress(item.NoteID)}
+                      />
                     )
                 )
               : notes
                   .filter((item) => !item.IsFav)
                   .map((item) => (
-                    <Pressable
-                      style={styles.note}
-                      key={item.NoteID}
-                      onPress={() => handleNotePress(item.NoteID)}
-                    >
-                      <Text
-                        style={styles.noteTitle}
-                        ellipsizeMode="tail"
-                        numberOfLines={1}
-                      >
-                        {item.Title}
-                      </Text>
-                      <Text style={styles.noteDate}>
-                        {new Date(item.CreationDate).toLocaleDateString()}
-                      </Text>
-                    </Pressable>
+                    <Note
+                      item={item}
+                      isFav={false}
+                      handleNotePress={() => handleNotePress(item.NoteID)}
+                    />
                   ))}
           </View>
         </ScrollView>

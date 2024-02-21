@@ -1,5 +1,5 @@
 import { View, StyleSheet, Text, TextInput, Pressable } from "react-native";
-import { API_URL_REG, API_URL_AUTH } from "../../Constants";
+import { API_URL_REG } from "../../Constants";
 import { useState } from "react";
 
 export default function Register({ signIn }) {
@@ -30,31 +30,6 @@ export default function Register({ signIn }) {
       }
     } catch (error) {
       alert(error);
-    }
-  };
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch(API_URL_AUTH, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.message);
-      }
-
-      const responseData = await response.json();
-      signIn(responseData);
-    } catch (error) {
-      console.error("Error during POST request:", error);
     }
   };
 

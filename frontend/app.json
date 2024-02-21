@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "frontend",
-    "slug": "frontend",
+    "slug": "note-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -21,10 +21,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.adiiwill.noteapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bf42638b-4612-4eab-a3ce-02959111846f"
+      }
+    },
+    "owner": "adiiwill"
   }
 }
